@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# pnpm
+/node_modules/
+
+# esbuild
+/build/
+
+# Remix
+/public/build/

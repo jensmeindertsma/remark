@@ -1,0 +1,42 @@
+{
+  "name": "@jensmeindertsma/remark",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:app": "remix build",
+    "build:server": "tsx ./scripts/build-server.ts",
+    "clean": "rimraf ./build/",
+    "dev": "remix dev -c 'tsx ./server/main.ts'",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "start": "node ./build/server/main.js",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@remix-run/express": "^2.1.0",
+    "@remix-run/node": "^2.1.0",
+    "@remix-run/react": "^2.1.0",
+    "compression": "^1.7.4",
+    "express": "^4.18.2",
+    "isbot": "^3.7.0",
+    "morgan": "^1.10.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "source-map-support": "^0.5.21"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "^2.1.0",
+    "@types/compression": "^1.7.4",
+    "@types/express": "^4.17.20",
+    "@types/morgan": "^1.9.7",
+    "@types/node": "^20.8.7",
+    "@types/react": "^18.2.31",
+    "@types/source-map-support": "^0.5.9",
+    "chokidar": "^3.5.3",
+    "esbuild": "^0.19.5",
+    "prettier": "^3.0.3",
+    "rimraf": "^5.0.5",
+    "tsx": "^3.14.0",
+    "typescript": "^5.2.2"
+  }
+}

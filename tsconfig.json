@@ -1,0 +1,11 @@
+{
+    "include": ["./**/*.js,", "./**/*.jsx", "./**/*.ts", "./**/*.tsx"],
+    "compilerOptions": {
+        "allowJs": true,
+        "jsx": "react-jsx",
+        "noEmit": true,
+        "module": "nodenext",
+        "strict": true,
+        "target": "esnext"
+    }
+}
