@@ -4,9 +4,9 @@ import * as url from "node:url";
 
 import { createRequestHandler } from "@remix-run/express";
 import {
-  type ServerBuild,
   broadcastDevReady,
   installGlobals,
+  type ServerBuild,
 } from "@remix-run/node";
 import compression from "compression";
 import express, { NextFunction, Request, Response } from "express";
@@ -38,7 +38,7 @@ app.disable("x-powered-by");
 // Remix fingerprints its assets so we can cache forever.
 app.use(
   "/build",
-  express.static("public/build", { immutable: true, maxAge: "1y" }),
+  express.static("public/build", { immutable: true, maxAge: "1y" })
 );
 
 app.use(express.static("public"));
@@ -52,7 +52,7 @@ app.listen(port, async () => {
   console.log(`Express server listening on port ${port}`);
 
   if (process.env.NODE_ENV === "development") {
-    broadcastDevReady(initialBuild);
+    await broadcastDevReady(initialBuild);
   }
 });
 
@@ -63,7 +63,7 @@ async function reimportServer(): Promise<ServerBuild> {
   const BUILD_URL = url.pathToFileURL(BUILD_PATH).href;
 
   // use a timestamp query parameter to bust the import cache
-  return import(BUILD_URL + "?t=" + stat.mtimeMs);
+  return import(BUILD_URL + "?t=" + stat.mtimeMs) as Promise<ServerBuild>;
 }
 
 async function createDevRequestHandler(initialBuild: ServerBuild) {
@@ -72,7 +72,7 @@ async function createDevRequestHandler(initialBuild: ServerBuild) {
     // 1. re-import the server build
     build = await reimportServer();
     // 2. tell Remix that this app server is now up-to-date and ready
-    broadcastDevReady(build);
+    await broadcastDevReady(build);
   }
   const chokidar = await import("chokidar");
   chokidar

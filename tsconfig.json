@@ -1,7 +1,6 @@
 {
-  "include": ["./**/*.js,", "./**/*.jsx", "./**/*.ts", "./**/*.tsx"],
+  "include": ["./**/*.ts", "./**/*.tsx"],
   "compilerOptions": {
-    "allowJs": true,
     "jsx": "react-jsx",
     "noEmit": true,
     "module": "nodenext",
