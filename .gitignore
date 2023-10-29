@@ -4,8 +4,12 @@
 # pnpm
 /node_modules/
 
-# esbuild
-/build/
-
 # Remix
+/build/
 /public/build/
+
+# Postgres
+/postgres-data/
+
+# Secrets
+/.env

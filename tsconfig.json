@@ -1,9 +1,14 @@
 {
   "include": ["./**/*.ts", "./**/*.tsx"],
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
     "jsx": "react-jsx",
     "noEmit": true,
     "module": "nodenext",
+    "paths": {
+      "~/*": ["./app/*"]
+    },
     "strict": true,
     "target": "esnext"
   }

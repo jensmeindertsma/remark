@@ -28,7 +28,10 @@ export default [
       "import/first": "warn",
       "import/newline-after-import": "warn",
       "import/no-duplicates": "warn",
-      "simple-import-sort/imports": ["warn", { groups: [["^node:"]] }],
+      "simple-import-sort/imports": [
+        "warn",
+        { groups: [["^\\u0000"], ["^node:"], ["^"], [".*\\.css$"]] },
+      ],
 
       "no-unused-vars": "warn",
     },
@@ -59,12 +62,18 @@ export default [
         },
       },
     },
+    settings: {
+      react: {
+        version: "detect",
+      },
+    },
     plugins: {
       react: reactPlugin,
       "react-hooks": reactHooksPlugin,
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
+      ...reactPlugin.configs["jsx-runtime"].rules,
       ...reactHooksPlugin.configs.recommended.rules,
     },
   },
