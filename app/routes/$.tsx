@@ -1,6 +1,14 @@
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { MetaResult } from "~/utils/remix.ts";
+import { MetaResult } from "~/utilities/remix.ts";
+
+export function meta(): MetaResult {
+  return [
+    {
+      title: "Page not found!",
+    },
+  ];
+}
 
 export default function NotFound() {
   return (
@@ -13,12 +21,4 @@ export default function NotFound() {
 
 export function loader() {
   return json(null, { status: 404 });
-}
-
-export function meta(): MetaResult {
-  return [
-    {
-      title: "Page Not Found",
-    },
-  ];
 }

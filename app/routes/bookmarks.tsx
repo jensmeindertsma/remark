@@ -1,8 +1,17 @@
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { database } from "~/utils/database.server.ts";
-import { LoaderArguments } from "~/utils/remix.ts";
-import { requireAuthenticatedSession } from "~/utils/session.server.ts";
+import { json, redirect } from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
+import { database } from "~/utilities/database.server.ts";
+import { formatTitle } from "~/utilities/meta.ts";
+import { LoaderArguments, MetaResult } from "~/utilities/remix.ts";
+import { getSession } from "~/utilities/session.server.ts";
+
+export function meta(): MetaResult {
+  return [
+    {
+      title: formatTitle("Bookmarks"),
+    },
+  ];
+}
 
 export default function Bookmarks() {
   const { bookmarks } = useLoaderData<typeof loader>();
@@ -32,12 +41,19 @@ export default function Bookmarks() {
       ) : (
         <p>You do not have any bookmarks right now!</p>
       )}
+      <Form method="POST" action="/signout">
+        <button type="submit">Sign out</button>
+      </Form>
     </>
   );
 }
 
 export async function loader({ request }: LoaderArguments) {
-  const session = await requireAuthenticatedSession(request);
+  const session = await getSession(request);
+
+  if (!session.isActive) {
+    return redirect("/signin");
+  }
 
   return json({
     bookmarks: await database.bookmark.findMany({

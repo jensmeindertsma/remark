@@ -8,12 +8,12 @@ import {
 } from "~/utilities/remix.ts";
 import { getSession } from "~/utilities/session.server.ts";
 
-import styles from "~/styles/signup.css";
+import styles from "~/styles/signin.css";
 
 export function meta(): MetaResult {
   return [
     {
-      title: formatTitle("Sign up"),
+      title: formatTitle("Sign in"),
     },
   ];
 }
@@ -22,20 +22,11 @@ export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
-export default function SignUp() {
+export default function SignIn() {
   return (
     <>
-      <h1>Sign up</h1>
+      <h1>Sign in</h1>
       <Form method="POST">
-        <label htmlFor="name">Your name</label>
-        <input
-          name="name"
-          id="name"
-          type="text"
-          placeholder="John Doe"
-          required
-        />
-
         <label htmlFor="email">Email address</label>
         <input
           name="email"
@@ -47,14 +38,6 @@ export default function SignUp() {
 
         <label htmlFor="password">Password</label>
         <input name="password" id="password" type="password" required />
-
-        <label htmlFor="confirm-password">Confirm your password</label>
-        <input
-          name="confirm-password"
-          id="confirm-password"
-          type="password"
-          required
-        />
 
         <button type="submit">Sign up</button>
       </Form>

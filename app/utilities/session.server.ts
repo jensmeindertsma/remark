@@ -19,14 +19,20 @@ const sessionStorage = createCookieSessionStorage({
 
 type Session =
   | {
-      isAuthenticated: true;
+      isActive: true;
       userId: string;
       /**
        * Returns a redirect that ends the session
        * */
-      end(): Promise<Response>;
+      end(options: { redirectTo: string }): Promise<Response>;
     }
-  | { isAuthenticated: false; authenticate(id: string): Promise<string> };
+  | {
+      isActive: false;
+      /**
+       * Returns a redirect that commits the session
+       * */
+      activate(options: { id: string; redirectTo: string }): Promise<Response>;
+    };
 
 export async function getSession(request: Request): Promise<Session> {
   const session = await sessionStorage.getSession(
@@ -37,33 +43,27 @@ export async function getSession(request: Request): Promise<Session> {
 
   if (userId) {
     return {
-      isAuthenticated: true,
+      isActive: true,
       userId,
-      async end() {
-        return redirect("/signin", {
+      async end({ redirectTo }) {
+        return redirect(redirectTo, {
           headers: {
-            "Set-Cookie": await sessionStorage.commitSession(session),
+            "Set-Cookie": await sessionStorage.destroySession(session),
           },
         });
       },
     };
   } else {
     return {
-      isAuthenticated: false,
-      async authenticate(id: string) {
+      isActive: false,
+      async activate({ id, redirectTo }) {
         session.set("id", id);
-        return await sessionStorage.commitSession(session);
+        return redirect(redirectTo, {
+          headers: {
+            "Set-Cookie": await sessionStorage.commitSession(session),
+          },
+        });
       },
     };
-  }
-}
-
-export async function requireAuthenticatedSession(request: Request) {
-  const session = await getSession(request);
-
-  if (!session.isAuthenticated) {
-    throw redirect("/signin");
-  } else {
-    return session;
   }
 }
