@@ -17,24 +17,20 @@ const sessionStorage = createCookieSessionStorage({
   cookie,
 });
 
-type Session =
-  | {
-      isActive: true;
-      userId: string;
-      /**
-       * Returns a redirect that ends the session
-       * */
-      end(options: { redirectTo: string }): Promise<Response>;
-    }
-  | {
-      isActive: false;
-      /**
-       * Returns a redirect that commits the session
-       * */
-      activate(options: { id: string; redirectTo: string }): Promise<Response>;
-    };
+type InactiveSession = {
+  isActive: false;
+  activate(option: { id: string; redirectTo: string }): Promise<never>;
+};
 
-export async function getSession(request: Request): Promise<Session> {
+type ActiveSession = {
+  isActive: true;
+  userId: string;
+  end(options: { redirectTo: string }): Promise<never>;
+};
+
+export async function getSession(
+  request: Request
+): Promise<InactiveSession | ActiveSession> {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );
@@ -46,7 +42,7 @@ export async function getSession(request: Request): Promise<Session> {
       isActive: true,
       userId,
       async end({ redirectTo }) {
-        return redirect(redirectTo, {
+        throw redirect(redirectTo, {
           headers: {
             "Set-Cookie": await sessionStorage.destroySession(session),
           },
@@ -58,7 +54,7 @@ export async function getSession(request: Request): Promise<Session> {
       isActive: false,
       async activate({ id, redirectTo }) {
         session.set("id", id);
-        return redirect(redirectTo, {
+        throw redirect(redirectTo, {
           headers: {
             "Set-Cookie": await sessionStorage.commitSession(session),
           },
