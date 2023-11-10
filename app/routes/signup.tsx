@@ -1,9 +1,8 @@
-import { conform, FieldConfig, useForm } from "@conform-to/react";
-import { getFieldsetConstraint, parse } from "@conform-to/zod";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { bcrypt } from "~/utilities/crypto.server.ts";
 import { database } from "~/utilities/database.server.ts";
+import { formatFeedback } from "~/utilities/feedback.server.ts";
 import { formatTitle } from "~/utilities/meta.ts";
 import {
   ActionArguments,
@@ -11,7 +10,6 @@ import {
   MetaResult,
 } from "~/utilities/remix.ts";
 import { getSession } from "~/utilities/session.server.ts";
-import { useId } from "react";
 import { z } from "zod";
 
 import styles from "~/styles/signup.css";
@@ -29,36 +27,75 @@ export function links() {
 }
 
 export default function SignUp() {
-  const lastSubmission = useActionData<typeof action>();
-
-  const id = useId();
-  const [form, fields] = useForm({
-    id,
-    lastSubmission,
-    constraint: getFieldsetConstraint(schema),
-    onValidate({ formData }) {
-      return parse(formData, {
-        // Create the schema without any constraint defined
-        schema,
-      });
-    },
-    shouldValidate: "onBlur",
-  });
+  const feedback = useActionData<typeof action>();
+  const navigation = useNavigation();
 
   return (
     <>
       <h1>Sign up</h1>
-      <Form method="POST" {...form.props}>
-        <Field type="text" field={fields.name} label="Your name" />
-        <Field type="email" field={fields.email} label="Email Address" />
-        <Field type="password" field={fields.password} label="Password" />
-        <Field
-          type="password"
-          field={fields.confirmPassword}
-          label="Confirm your password"
-        />
+      <Form method="POST">
+        <fieldset disabled={navigation.state === "submitting"}>
+          <label htmlFor="name">Name</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            aria-invalid={Boolean(feedback?.name.error)}
+            aria-describedby="name-error"
+            defaultValue={feedback?.name.value}
+          />
+          <div style={{ color: "red" }} id="name-error">
+            {feedback?.name.error}
+          </div>
 
-        <button type="submit">Sign up</button>
+          <label htmlFor="email">Email Address</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            aria-invalid={Boolean(feedback?.email.error)}
+            aria-describedby="email-error"
+            defaultValue={feedback?.email.value}
+          />
+          <div style={{ color: "red" }} id="email-error">
+            {feedback?.email.error}
+          </div>
+
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            aria-invalid={Boolean(feedback?.password.error)}
+            aria-describedby="password-error"
+            defaultValue={feedback?.password.value}
+          />
+          <div style={{ color: "red" }} id="password-error">
+            {feedback?.password.error}
+          </div>
+
+          <label htmlFor="confirm-password">Confirm your password</label>
+          <input
+            id="confirm-password"
+            name="confirm-password"
+            type="password"
+            required
+            aria-invalid={Boolean(feedback?.confirmPassword.error)}
+            aria-describedby="confirm-password-error"
+          />
+          <div style={{ color: "red" }} id="confirm-password-error">
+            {feedback?.confirmPassword.error}
+          </div>
+
+          <button type="submit" disabled={navigation.state === "submitting"}>
+            {navigation.state === "submitting"
+              ? "Signing you up..."
+              : "Sign up"}
+          </button>
+        </fieldset>
       </Form>
     </>
   );
@@ -82,29 +119,36 @@ export async function action({ request }: ActionArguments) {
   }
 
   const formData = await request.formData();
-  const submission = await parse(formData, {
-    schema: schema.superRefine(async (data, ctx) => {
-      const existingUser = await database.user.findUnique({
-        where: { email: data.email },
-        select: { id: true },
-      });
-      if (existingUser) {
-        ctx.addIssue({
-          path: ["email"],
-          code: z.ZodIssueCode.custom,
-          message: "A user already exists with this email",
-        });
-        return;
-      }
-    }),
-    async: true,
-  });
+  const rawData = {
+    name: String(formData.get("name")),
+    email: String(formData.get("email")),
+    password: String(formData.get("password")),
+    confirmPassword: String(formData.get("confirm-password")),
+  };
 
-  if (!submission.value || submission.intent !== "submit") {
-    return json(submission);
+  const result = await schema
+    .refine(
+      async (data) => {
+        const existingUser = await database.user.findUnique({
+          where: { email: data.email },
+          select: { id: true },
+        });
+        // if no existing user, then is valid
+        return !existingUser;
+      },
+      {
+        message: "A user already exists with this email",
+        path: ["email"], // path of error
+      }
+    )
+    .safeParseAsync(rawData);
+
+  if (!result.success) {
+    return json(formatFeedback(rawData, result.error));
   }
 
-  const { name, email, password } = submission.value;
+  const { name, email, password } = result.data;
+
   const { id } = await database.user.create({
     data: {
       name,
@@ -141,27 +185,3 @@ const schema = z
     message: "This password does not match the one you entered above",
     path: ["confirmPassword"],
   });
-
-type FieldProps = {
-  type: "text" | "email" | "password";
-  field: FieldConfig<string>;
-  label: string;
-};
-
-function Field({ type, field, label }: FieldProps) {
-  return (
-    <>
-      <label htmlFor={field.id}>{label}</label>
-      <input
-        aria-invalid={Boolean(field.error)}
-        aria-describedby={`${field.id}-error`}
-        {...conform.input(field, {
-          type,
-        })}
-      />
-      <div style={{ color: "red" }} id={`${field.id}-error`}>
-        {field.error}
-      </div>
-    </>
-  );
-}

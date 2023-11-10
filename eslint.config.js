@@ -10,8 +10,10 @@ import globals from "globals";
 /** @type { import("eslint").Linter.FlatConfig[] } */
 export default [
   {
-    // This configuration object applies to ~all~ source files.
     ignores: ["build/**", "public/build/**"],
+  },
+  {
+    // Configure settings that apply to *all* files unless overriden
     languageOptions: {
       globals: {
         ...globals.browser,

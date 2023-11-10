@@ -11,6 +11,8 @@ import { ReactNode } from "react";
 
 import styles from "./styles/root.css";
 
+const ENABLE_SCRIPTS = true;
+
 export function links() {
   return [
     { rel: "stylesheet", href: styles },
@@ -55,7 +57,9 @@ function Document({ children }: { children: ReactNode }) {
       <body>
         {children}
         <ScrollRestoration />
-        <Scripts />
+
+        {ENABLE_SCRIPTS ? <Scripts /> : null}
+
         <LiveReload />
       </body>
     </html>
