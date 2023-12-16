@@ -95,12 +95,10 @@ export function ErrorBoundary() {
 
   return (
     <Document>
-      <h1>Oh shit!</h1>
-      <p>Every measure we took against application failure has failed us!</p>
-      <p>
-        This is certainly unexpected, please try reloading the page and reach
-        out if that does not help!
-      </p>
+      <h1>Error!</h1>
+      <pre>
+        <code>{JSON.stringify(error, null, 2)}</code>
+      </pre>
     </Document>
   );
 }

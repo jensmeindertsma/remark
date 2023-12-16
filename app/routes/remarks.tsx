@@ -1,7 +1,7 @@
 import { json, redirect } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { database } from "~/utilities/database.server.ts";
-import { Feedback, formatFeedback } from "~/utilities/feedback.server.ts";
+import { formatFeedback } from "~/utilities/feedback.server.ts";
 import { formatTitle } from "~/utilities/meta.ts";
 import {
   ActionArguments,
@@ -24,6 +24,7 @@ export default function Remarks() {
   const { remarks } = useLoaderData<typeof loader>();
 
   const createFetcher = useFetcher<typeof action>();
+  const feedback = createFetcher.data;
   const isCreating = createFetcher.state !== "idle";
   const createFormRef = useRef<HTMLFormElement>(null);
 
@@ -47,12 +48,20 @@ export default function Remarks() {
             id="title"
             name="title"
             required
-            aria-invalid={Boolean(createFetcher.data?.title.error)}
+            aria-invalid={Boolean(
+              feedback?.status === Status.CreateFailure && feedback?.title.error
+            )}
             aria-describedby="title-feedback"
-            defaultValue={createFetcher.data?.title.value}
+            defaultValue={
+              feedback?.status === Status.CreateFailure
+                ? feedback?.title.value
+                : undefined
+            }
           />
           <div style={{ color: "red" }} id="title-feedback">
-            {createFetcher.data?.title.error}
+            {feedback?.status === Status.CreateFailure
+              ? feedback?.title.value
+              : null}
           </div>
 
           <label htmlFor="progress">Current progress</label>
@@ -62,12 +71,21 @@ export default function Remarks() {
             name="progress"
             required
             placeholder="Chapter 4.8 (page 78)"
-            aria-invalid={Boolean(createFetcher.data?.progress.error)}
+            aria-invalid={Boolean(
+              feedback?.status === Status.CreateFailure &&
+                feedback?.progress.error
+            )}
             aria-describedby="progress-feedback"
-            defaultValue={createFetcher.data?.progress.value}
+            defaultValue={
+              feedback?.status === Status.CreateFailure
+                ? feedback?.progress.value
+                : undefined
+            }
           />
           <div style={{ color: "red" }} id="progress-feedback">
-            {createFetcher.data?.progress.error}
+            {feedback?.status === Status.CreateFailure
+              ? feedback?.progress.value
+              : null}
           </div>
 
           <button type="submit">{isCreating ? "Creating..." : "Create"}</button>
@@ -100,50 +118,112 @@ function Remark({ id, title, progress }: RemarkData) {
   const fetcher = useFetcher<typeof action>();
   const isSubmitting = fetcher.state !== "idle";
   const feedback = fetcher.data;
+  const status = feedback?.status;
 
   return (
     <>
-      <h2>{title}</h2>
-      <p>
-        Current progress: <b>{progress}</b>
-      </p>
-      <fetcher.Form method="POST">
-        <fieldset disabled={isSubmitting}>
-          <input type="hidden" name="id" value={id} />
+      {feedback?.status === Status.Editing ||
+      feedback?.status === Status.EditFailure ? (
+        <>
+          <fetcher.Form method="POST">
+            <fieldset disabled={isSubmitting}>
+              <input type="hidden" name="intent" value={Intent.Save} />
+              <input type="hidden" name="id" value={id} />
 
-          <button type="submit" name="intent" value={Intent.Edit}>
-            Edit
-          </button>
-          <button
-            type="submit"
-            name="intent"
-            value={Intent.Delete}
-            disabled={isSubmitting || feedback?.status === Status.ConfirmDelete}
-          >
-            Delete
-          </button>
-          {feedback?.status === Status.ConfirmDelete ? (
-            <>
-              <button
-                type="submit"
-                name="intent"
-                value={Intent.ConfirmDelete}
-                disabled={isSubmitting}
-              >
-                Confirm delete
+              <label htmlFor="title">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                required
+                aria-invalid={Boolean(
+                  feedback.status === Status.EditFailure &&
+                    feedback?.title.error
+                )}
+                aria-describedby="title-feedback"
+                defaultValue={
+                  status === Status.EditFailure ? feedback.title.value : title
+                }
+              />
+              <div style={{ color: "red" }} id="title-feedback">
+                {status === Status.EditFailure ? feedback?.title.error : null}
+              </div>
+
+              <label htmlFor="progress">Current progress</label>
+              <input
+                type="text"
+                id="progress"
+                name="progress"
+                required
+                placeholder="Chapter 4.8 (page 78)"
+                aria-invalid={Boolean(
+                  feedback.status === Status.EditFailure &&
+                    feedback?.progress.error
+                )}
+                aria-describedby="progress-feedback"
+                defaultValue={
+                  status === Status.EditFailure
+                    ? feedback.progress.value
+                    : progress
+                }
+              />
+              <div style={{ color: "red" }} id="progress-feedback">
+                {status === Status.EditFailure
+                  ? feedback?.progress.error
+                  : null}
+              </div>
+
+              <button type="submit">
+                {isSubmitting ? "Saving..." : "Save"}
               </button>
-              <button
-                type="submit"
-                name="intent"
-                value={Intent.Cancel}
-                disabled={isSubmitting}
-              >
+
+              <button type="submit" name="intent" value={Intent.Cancel}>
                 Cancel
               </button>
-            </>
-          ) : null}
-        </fieldset>
-      </fetcher.Form>
+            </fieldset>
+          </fetcher.Form>
+        </>
+      ) : (
+        <>
+          <h2>{title}</h2>
+          <p>
+            Current progress: <b>{progress}</b>
+          </p>
+          <fetcher.Form method="POST">
+            <fieldset disabled={isSubmitting}>
+              <input type="hidden" name="id" value={id} />
+
+              <button type="submit" name="intent" value={Intent.Edit}>
+                Edit
+              </button>
+              <button
+                type="submit"
+                name="intent"
+                value={Intent.Delete}
+                disabled={
+                  isSubmitting || feedback?.status === Status.ConfirmDelete
+                }
+              >
+                Delete
+              </button>
+              {feedback?.status === Status.ConfirmDelete ? (
+                <>
+                  <button
+                    type="submit"
+                    name="intent"
+                    value={Intent.ConfirmDelete}
+                  >
+                    Confirm delete
+                  </button>
+                  <button type="submit" name="intent" value={Intent.Cancel}>
+                    Cancel
+                  </button>
+                </>
+              ) : null}
+            </fieldset>
+          </fetcher.Form>
+        </>
+      )}
     </>
   );
 }
@@ -200,8 +280,8 @@ export async function action({ request }: ActionArguments) {
       if (!result.success) {
         return json(
           {
-            name: "bfooba",
             status: Status.CreateFailure as const,
+            ...formatFeedback(data, result.error),
           },
           400
         );
@@ -219,15 +299,64 @@ export async function action({ request }: ActionArguments) {
 
       return json(null);
     }
+    case Intent.Edit: {
+      const { title, progress } = Object.fromEntries(formData);
+
+      return json({
+        status: Status.Editing as const,
+        title: { value: title, error: null },
+        progress: { value: progress, error: null },
+      });
+    }
+    case Intent.Save: {
+      const data = {
+        id: formData.get("id"),
+        title: String(formData.get("title")),
+        progress: String(formData.get("progress")),
+      };
+
+      const result = z
+        .object({
+          id: z.string(),
+          title: z.string().min(3, "too short!"),
+          progress: z.string(),
+        })
+        .safeParse(data);
+
+      if (!result.success) {
+        return json(
+          {
+            status: Status.EditFailure as const,
+            ...formatFeedback(data, result.error),
+          },
+          400
+        );
+      }
+
+      const { id, title, progress } = result.data;
+
+      await database.remark.update({
+        where: { id },
+        data: {
+          title,
+          progress,
+          userId: session.userId,
+        },
+      });
+
+      return json(null);
+    }
     case Intent.Delete: {
-      return json({ status: Status.ConfirmDelete });
+      return json({ status: Status.ConfirmDelete as const });
     }
     case Intent.ConfirmDelete: {
-      const id = String(formData.get("id"));
+      const id = formData.get("id");
 
-      if (!id) {
+      if (!id || typeof id !== "string") {
         throw new Error("Missing remark id");
       }
+
+      await database.remark.delete({ where: { id } });
     }
   }
 
@@ -240,9 +369,12 @@ enum Intent {
   Delete = "delete",
   ConfirmDelete = "confirm-delete",
   Edit = "edit",
+  Save = "save ",
 }
 
 enum Status {
   CreateFailure = "create-failure",
   ConfirmDelete = "confirm-delete",
+  Editing = "editing",
+  EditFailure = "edit-failure",
 }

@@ -4,7 +4,7 @@ export type Feedback<T> = {
   [K in keyof T]: { value: string; error: string | undefined };
 };
 
-export function formatFeedback<T extends { [K in keyof T]: string }>(
+export function formatFeedback<T extends { [K in keyof T]: unknown }>(
   rawData: T,
   parseError: ZodError<T>
 ): Feedback<T> {
