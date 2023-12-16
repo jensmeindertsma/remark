@@ -17,7 +17,7 @@ import styles from "~/styles/signup.css";
 export function meta(): MetaResult {
   return [
     {
-      title: formatTitle("Sign up"),
+      title: formatTitle("Sign in"),
     },
   ];
 }
@@ -30,7 +30,7 @@ export async function loader({ request }: LoaderArguments) {
   const session = await getSession(request);
 
   if (session.isActive) {
-    return redirect("/bookmarks");
+    return redirect("/remarks");
   }
 
   return json(null);
@@ -39,12 +39,13 @@ export async function loader({ request }: LoaderArguments) {
 export default function SignIn() {
   const feedback = useActionData<typeof action>();
   const navigation = useNavigation();
+  const isSubmitting = ["submitting", "loading"].includes(navigation.state);
 
   return (
     <>
-      <h1>Sign up</h1>
+      <h1>Sign in</h1>
       <Form method="POST">
-        <fieldset disabled={navigation.state === "submitting"}>
+        <fieldset disabled={isSubmitting}>
           <label htmlFor="email">Email Address</label>
           <input
             id="email"
@@ -73,10 +74,8 @@ export default function SignIn() {
             {feedback?.password.error}
           </div>
 
-          <button type="submit" disabled={navigation.state === "submitting"}>
-            {navigation.state === "submitting"
-              ? "Signing you up..."
-              : "Sign up"}
+          <button type="submit">
+            {isSubmitting ? "Signing you in..." : "Sign in"}
           </button>
         </fieldset>
       </Form>
@@ -88,7 +87,7 @@ export async function action({ request }: ActionArguments) {
   const session = await getSession(request);
 
   if (session.isActive) {
-    return redirect("/bookmarks");
+    return redirect("/remarks");
   }
 
   const formData = await request.formData();
@@ -147,11 +146,10 @@ export async function action({ request }: ActionArguments) {
   });
 
   if (!user) {
-    console.error("user deleted since check");
-    return redirect("/signin");
+    throw new Error("user deleted since check");
   }
 
-  await session.activate({ id: user.id, redirectTo: "/bookmarks" });
+  await session.activate({ id: user.id, redirectTo: "/remarks" });
 }
 
 const schema = z.object({

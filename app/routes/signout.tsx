@@ -6,7 +6,7 @@ export async function loader({ request }: LoaderArguments) {
   const session = await getSession(request);
 
   if (session.isActive) {
-    return redirect("/bookmarks");
+    return redirect("/remarks");
   } else {
     return redirect("/signin");
   }

@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
 
-type Feedback<T> = {
+export type Feedback<T> = {
   [K in keyof T]: { value: string; error: string | undefined };
 };
 

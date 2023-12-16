@@ -29,12 +29,13 @@ export function links() {
 export default function SignUp() {
   const feedback = useActionData<typeof action>();
   const navigation = useNavigation();
+  const isSubmitting = ["submitting", "loading"].includes(navigation.state);
 
   return (
     <>
       <h1>Sign up</h1>
       <Form method="POST">
-        <fieldset disabled={navigation.state === "submitting"}>
+        <fieldset disabled={isSubmitting}>
           <label htmlFor="name">Name</label>
           <input
             id="name"
@@ -90,10 +91,8 @@ export default function SignUp() {
             {feedback?.confirmPassword.error}
           </div>
 
-          <button type="submit" disabled={navigation.state === "submitting"}>
-            {navigation.state === "submitting"
-              ? "Signing you up..."
-              : "Sign up"}
+          <button type="submit">
+            {isSubmitting ? "Signing you up..." : "Sign up"}
           </button>
         </fieldset>
       </Form>
@@ -105,7 +104,7 @@ export async function loader({ request }: LoaderArguments) {
   const session = await getSession(request);
 
   if (session.isActive) {
-    return redirect("/bookmarks");
+    return redirect("/remarks");
   }
 
   return json(null);
@@ -115,7 +114,7 @@ export async function action({ request }: ActionArguments) {
   const session = await getSession(request);
 
   if (session.isActive) {
-    return redirect("/bookmarks");
+    return redirect("/remarks");
   }
 
   const formData = await request.formData();
@@ -164,7 +163,7 @@ export async function action({ request }: ActionArguments) {
     },
   });
 
-  await session.activate({ id, redirectTo: "/bookmarks" });
+  await session.activate({ id, redirectTo: "/remarks" });
 }
 
 const schema = z
