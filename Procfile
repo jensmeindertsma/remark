@@ -1,1 +1,1 @@
-release: pnpm exec prisma migrate deploy
+release: pnpm dlx prisma migrate deploy
