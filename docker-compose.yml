@@ -1,10 +1,6 @@
 version: "3.8"
-networks:
-  default: 
-    name: remark
 services:
   database:
-    container_name: database
     image: postgres:latest
     restart: always
     environment:
@@ -15,3 +11,12 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
+  app:
+    build: .
+    depends_on:
+      - database
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://jens:ch0col4te@database:5432/remark
+      - SESSION_SECRET=foobar

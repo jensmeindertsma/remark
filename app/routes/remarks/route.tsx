@@ -51,7 +51,7 @@ export default function Remarks() {
           <h2>Create a new remark</h2>
 
           <Field
-            label="title"
+            label="Title"
             name="title"
             type="text"
             defaultValue={
@@ -68,7 +68,7 @@ export default function Remarks() {
           />
 
           <Field
-            label="progress"
+            label="Progress"
             name="progress"
             type="text"
             defaultValue={
