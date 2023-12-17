@@ -4,6 +4,7 @@ import { getSession } from "./utilities/session.server.ts";
 import { json } from "@remix-run/node";
 import {
   Form,
+  isRouteErrorResponse,
   Link,
   Links,
   LiveReload,
@@ -98,11 +99,33 @@ export function ErrorBoundary() {
 
   console.error(error);
 
+  if (isRouteErrorResponse(error)) {
+    return (
+      <Document>
+        <h1>
+          {error.status} {error.statusText}
+        </h1>
+        <pre>
+          <code>{error.data}</code>
+        </pre>
+      </Document>
+    );
+  } else if (error instanceof Error) {
+    return (
+      <Document>
+        <h1>Error!</h1>
+        <pre>
+          <code>{error.message}</code>
+        </pre>
+      </Document>
+    );
+  }
+
   return (
     <Document>
       <h1>Error!</h1>
       <pre>
-        <code>{JSON.stringify(error, null, 2)}</code>
+        <code>An unknown error occured!</code>
       </pre>
     </Document>
   );

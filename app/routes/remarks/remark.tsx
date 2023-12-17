@@ -1,6 +1,7 @@
 import { Intent, Status } from "./constants.ts";
 import type { action } from "./route.tsx";
 import { useFetcher } from "@remix-run/react";
+import { Field } from "~/components/Field.tsx";
 
 type Props = {
   id: string;
@@ -15,43 +16,100 @@ export function Remark({ id, title, progress }: Props) {
 
   return (
     <>
-      <h2>{title}</h2>
-      <p>
-        Progress: <b>{progress}</b>
-      </p>
-      <fetcher.Form method="POST">
-        <input type="hidden" name="id" value={id} />
+      {feedback?.status === Status.Editing ||
+      feedback?.status === Status.Feedback ? (
+        <fetcher.Form method="POST">
+          <input type="hidden" name="id" value={id} />
 
-        <button
-          type="submit"
-          name="intent"
-          value={Intent.Delete}
-          disabled={isSubmitting || feedback?.status === Status.ConfirmDelete}
-        >
-          Delete remark
-        </button>
+          <Field
+            name="title"
+            type="text"
+            label="Title"
+            required
+            defaultValue={
+              feedback?.status === Status.Feedback
+                ? feedback?.values.title
+                : title
+            }
+            error={
+              feedback?.status === Status.Feedback
+                ? feedback?.errors.title
+                : undefined
+            }
+          />
 
-        {feedback?.status === Status.ConfirmDelete ? (
-          <>
+          <Field
+            name="progress"
+            type="text"
+            label="Progress"
+            required
+            defaultValue={
+              feedback?.status === Status.Feedback
+                ? feedback?.values.progress
+                : progress
+            }
+            error={
+              feedback?.status === Status.Feedback
+                ? feedback?.errors.progress
+                : undefined
+            }
+          />
+
+          <button type="submit" name="intent" value={Intent.Save}>
+            Save
+          </button>
+
+          <button type="submit" name="intent" value={Intent.Cancel}>
+            Cancel
+          </button>
+        </fetcher.Form>
+      ) : (
+        <>
+          <h2>{title}</h2>
+          <p>
+            Progress: <b>{progress}</b>
+          </p>
+          <fetcher.Form method="POST">
+            <input type="hidden" name="id" value={id} />
+
+            <button type="submit" name="intent" value={Intent.Edit}>
+              Edit
+            </button>
+
             <button
               type="submit"
               name="intent"
-              value={Intent.ConfirmDelete}
-              disabled={isSubmitting}
+              value={Intent.Delete}
+              disabled={
+                isSubmitting || feedback?.status === Status.ConfirmDelete
+              }
             >
-              Confirm delete
+              Delete
             </button>
-            <button
-              type="submit"
-              name="intent"
-              value={Intent.Cancel}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-          </>
-        ) : null}
-      </fetcher.Form>
+
+            {feedback?.status === Status.ConfirmDelete ? (
+              <>
+                <button
+                  type="submit"
+                  name="intent"
+                  value={Intent.ConfirmDelete}
+                  disabled={isSubmitting}
+                >
+                  Confirm
+                </button>
+                <button
+                  type="submit"
+                  name="intent"
+                  value={Intent.Cancel}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : null}
+          </fetcher.Form>
+        </>
+      )}
     </>
   );
 }

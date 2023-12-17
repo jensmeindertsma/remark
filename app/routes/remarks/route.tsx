@@ -1,5 +1,10 @@
 import { Intent, Status } from "./constants.ts";
-import { createRemark, deleteRemark, getRemarks } from "./queries.ts";
+import {
+  createRemark,
+  deleteRemark,
+  getRemarks,
+  updateRemark,
+} from "./queries.ts";
 import { Remark } from "./remark.tsx";
 import { validate } from "./validate.ts";
 import { json } from "@remix-run/node";
@@ -50,12 +55,12 @@ export default function Remarks() {
             name="title"
             type="text"
             defaultValue={
-              feedback?.status === Status.CreationFeedback
+              feedback?.status === Status.Feedback
                 ? feedback.values.title
                 : undefined
             }
             error={
-              feedback?.status === Status.CreationFeedback
+              feedback?.status === Status.Feedback
                 ? feedback.errors.title
                 : undefined
             }
@@ -67,12 +72,12 @@ export default function Remarks() {
             name="progress"
             type="text"
             defaultValue={
-              feedback?.status === Status.CreationFeedback
+              feedback?.status === Status.Feedback
                 ? feedback.values.progress
                 : undefined
             }
             error={
-              feedback?.status === Status.CreationFeedback
+              feedback?.status === Status.Feedback
                 ? feedback.errors.progress
                 : undefined
             }
@@ -125,7 +130,7 @@ export async function action({ request }: ActionArguments) {
 
       if (errors) {
         return badRequest({
-          status: Status.CreationFeedback as const,
+          status: Status.Feedback as const,
           values: { title, progress },
           errors,
         });
@@ -136,16 +141,35 @@ export async function action({ request }: ActionArguments) {
       return json(null);
     }
     case Intent.Edit: {
-      throw new Error("TODO");
-
-      // return json({
-      //   status: Status.Editing as const,
-      // });
+      return json({
+        status: Status.Editing as const,
+      });
     }
     case Intent.Save: {
-      throw new Error("TODO");
+      const [id, title, progress] = getFields(formData, [
+        "id",
+        "title",
+        "progress",
+      ]);
 
-      // return json(null);
+      if (!id) {
+        // TODO: fallback to error boundary
+        throw new Error("Missing remark id");
+      }
+
+      const errors = validate({ title, progress });
+
+      if (errors) {
+        return badRequest({
+          status: Status.Feedback as const,
+          values: { title, progress },
+          errors,
+        });
+      }
+
+      await updateRemark({ id, title, progress });
+
+      return json(null);
     }
     case Intent.Delete: {
       return json({ status: Status.ConfirmDelete as const });

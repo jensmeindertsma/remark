@@ -25,6 +25,16 @@ export async function createRemark({ accountId, title, progress }: CreateData) {
   });
 }
 
+type UpdateData = {
+  id: string;
+  title: string;
+  progress: string;
+};
+
+export async function updateRemark({ id, title, progress }: UpdateData) {
+  await prisma.remark.update({ where: { id }, data: { title, progress } });
+}
+
 export async function deleteRemark(id: string) {
   await prisma.remark.delete({ where: { id } });
 }

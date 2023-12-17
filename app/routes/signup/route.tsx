@@ -10,6 +10,7 @@ import type {
   LoaderArguments,
   MetaResult,
 } from "~/utilities/remix.ts";
+import { badRequest } from "~/utilities/response.server.ts";
 
 export function meta(): MetaResult {
   return [
@@ -83,7 +84,7 @@ export async function action({ request }: ActionArguments) {
   const errors = await validate({ name, email, password });
 
   if (errors) {
-    return { values: { name, email, password }, errors };
+    return badRequest({ values: { name, email, password }, errors });
   }
 
   const { id } = await createAccount({ name, email, password });

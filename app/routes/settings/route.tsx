@@ -116,7 +116,7 @@ export default function Settings() {
               value={Intent.ConfirmDelete}
               disabled={isSubmitting}
             >
-              Confirm delete
+              Confirm
             </button>
             <button
               type="submit"
