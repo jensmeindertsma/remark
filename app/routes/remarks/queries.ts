@@ -1,0 +1,30 @@
+import { prisma } from "~/utilities/database.server.ts";
+
+export async function getRemarks(id: string) {
+  return await prisma.remark.findMany({
+    where: { accountId: id },
+    orderBy: {
+      edited: "desc",
+    },
+  });
+}
+
+type CreateData = {
+  accountId: string;
+  title: string;
+  progress: string;
+};
+
+export async function createRemark({ accountId, title, progress }: CreateData) {
+  await prisma.remark.create({
+    data: {
+      accountId,
+      title,
+      progress,
+    },
+  });
+}
+
+export async function deleteRemark(id: string) {
+  await prisma.remark.delete({ where: { id } });
+}

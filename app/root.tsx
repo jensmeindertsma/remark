@@ -1,5 +1,5 @@
-import { database } from "./utilities/database.server.ts";
-import { LoaderArguments } from "./utilities/remix.ts";
+import { prisma } from "./utilities/database.server.ts";
+import type { LoaderArguments } from "./utilities/remix.ts";
 import { getSession } from "./utilities/session.server.ts";
 import { json } from "@remix-run/node";
 import {
@@ -15,15 +15,15 @@ import {
   useNavigation,
   useRouteError,
 } from "@remix-run/react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import styles from "./styles/root.css";
+import tailwind from "./tailwind.css";
 
 const ENABLE_SCRIPTS = true;
 
 export function links() {
   return [
-    { rel: "stylesheet", href: styles },
+    { rel: "stylesheet", href: tailwind },
     { rel: "icon", type: "image/png", href: "/crayon.png" },
   ];
 }
@@ -31,46 +31,51 @@ export function links() {
 export default function Root() {
   const { isAuthenticated, name } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
-  const isSigningOut = navigation.formAction === "/signout";
 
   return (
     <Document>
-      {isAuthenticated ? (
-        <header>
-          <p>Welcome to Remark, you are signed in as {name}</p>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/remarks">Remarks</Link>
-              </li>
-              <li>
-                <Link to="/settings">Settings</Link>
-              </li>
-            </ul>
-          </nav>
+      <header className="dark:bg-slate-500 flex flex-row justify-between">
+        <nav>
+          <ul className="flex flex-row justify-between">
+            <li>
+              <Link to={isAuthenticated ? "/remarks" : "/"}>Remark</Link>
+            </li>
+            {isAuthenticated ? (
+              <>
+                <li>
+                  <Link to="/remarks">Remarks</Link>
+                </li>
+                <li>
+                  <Link to="/settings">Settings</Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link to="/signup">Sign up</Link>
+                </li>
+                <li>
+                  <Link to="/signin">Sign in</Link>
+                </li>
+              </>
+            )}
+          </ul>
+        </nav>
+
+        {isAuthenticated ? <div>Welcome, {name}</div> : null}
+
+        {isAuthenticated ? (
           <Form method="POST" action="/signout">
-            <button type="submit" disabled={isSigningOut}>
-              {isSigningOut ? "Signing you out..." : "Sign out"}
+            <button
+              type="submit"
+              disabled={navigation.formAction === "/signout"}
+            >
+              {navigation.formAction === "/signout" ? "Working..." : "Sign out"}
             </button>
           </Form>
-        </header>
-      ) : (
-        <header>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Remark</Link>
-              </li>
-              <li>
-                <Link to="/signup">Sign up</Link>
-              </li>
-              <li>
-                <Link to="/signin">Sign in</Link>
-              </li>
-            </ul>
-          </nav>
-        </header>
-      )}
+        ) : null}
+      </header>
+
       <Outlet />
     </Document>
   );
@@ -82,7 +87,7 @@ export async function loader({ request }: LoaderArguments) {
   return json({
     isAuthenticated: session.isActive,
     name: session.isActive
-      ? (await database.user.findUnique({ where: { id: session.userId } }))
+      ? (await prisma.account.findUnique({ where: { id: session.userId } }))
           ?.name
       : undefined,
   });
@@ -112,13 +117,12 @@ function Document({ children }: { children: ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="dark:bg-gray-900 dark:text-white">
         {children}
         <ScrollRestoration />
 
-        {ENABLE_SCRIPTS ? <Scripts /> : null}
-
         <LiveReload />
+        {ENABLE_SCRIPTS ? <Scripts /> : null}
       </body>
     </html>
   );

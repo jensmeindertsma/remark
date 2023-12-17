@@ -1,6 +1,6 @@
-import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { MetaResult } from "~/utilities/remix.ts";
+import type { MetaResult } from "~/utilities/remix.ts";
+import { notFound } from "~/utilities/response.server.ts";
 
 export function meta(): MetaResult {
   return [
@@ -20,5 +20,5 @@ export default function NotFound() {
 }
 
 export function loader() {
-  return json(null, { status: 404 });
+  return notFound(null);
 }

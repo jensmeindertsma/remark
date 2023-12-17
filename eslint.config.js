@@ -51,7 +51,7 @@ export default [
     },
     rules: {
       ...typescriptPlugin.configs["recommended-type-checked"].rules,
-      "@typescript-eslint/no-misused-promises": "off",
+      "@typescript-eslint/consistent-type-imports": "warn",
       "@typescript-eslint/no-unused-vars": "warn",
     },
   },

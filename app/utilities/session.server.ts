@@ -28,9 +28,9 @@ type ActiveSession = {
   end(options: { redirectTo: string }): Promise<never>;
 };
 
-export async function getSession(
-  request: Request
-): Promise<InactiveSession | ActiveSession> {
+type Session = InactiveSession | ActiveSession;
+
+export async function getSession(request: Request): Promise<Session> {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );
