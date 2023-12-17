@@ -32,7 +32,7 @@ type Session = InactiveSession | ActiveSession;
 
 export async function getSession(request: Request): Promise<Session> {
   const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
+    request.headers.get("Cookie"),
   );
 
   const userId = session.get("id") as string | undefined;

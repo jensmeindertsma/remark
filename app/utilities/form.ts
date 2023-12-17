@@ -1,6 +1,6 @@
 export function getFields<T extends string[]>(
   formData: FormData,
-  fields: T
+  fields: T,
 ): T {
   return fields.map((field) => {
     const value = formData.get(field);

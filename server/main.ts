@@ -39,7 +39,7 @@ app.disable("x-powered-by");
 // Remix fingerprints its assets so we can cache forever.
 app.use(
   "/build",
-  express.static("public/build", { immutable: true, maxAge: "1y" })
+  express.static("public/build", { immutable: true, maxAge: "1y" }),
 );
 
 app.use(express.static("public"));
