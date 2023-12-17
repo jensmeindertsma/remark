@@ -13,6 +13,7 @@ export default function Home() {
   return (
     <>
       <p>Reading digital material was never this easy!</p>
+      <p>Remark is my first Remix project!</p>
     </>
   );
 }

@@ -10,6 +10,7 @@ WORKDIR /app
 ADD prisma ./prisma
 ADD package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod=false
+RUN pnpm run database:generate
 
 FROM base as production
 WORKDIR /app
