@@ -4,14 +4,6 @@ on:
     branches:
       - main
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  actions: write
-  contents: read
-
 jobs:
   format:
     runs-on: ubuntu-latest
@@ -88,7 +80,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy
-        uses: dokku/github-action@1
+        uses: dokku/github-action@master
         with:
           branch: main
           git_remote_url: "ssh://dokku@${{ secrets.HOST }}:22/remark"
