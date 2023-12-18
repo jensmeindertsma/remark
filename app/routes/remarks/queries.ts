@@ -32,7 +32,10 @@ type UpdateData = {
 };
 
 export async function updateRemark({ id, title, progress }: UpdateData) {
-  await prisma.remark.update({ where: { id }, data: { title, progress } });
+  await prisma.remark.update({
+    where: { id },
+    data: { title, progress, edited: new Date() },
+  });
 }
 
 export async function deleteRemark(id: string) {

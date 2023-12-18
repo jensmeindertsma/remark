@@ -44,11 +44,15 @@ export default function Remarks() {
 
   return (
     <>
-      <h1>Remarks</h1>
-      <fetcher.Form method="POST" ref={formRef}>
+      <h1 className="text-3xl w-80 mx-auto md:mt-40 md:w-96 mb-10">Remarks</h1>
+      <fetcher.Form
+        method="POST"
+        ref={formRef}
+        className="mx-auto mt-4 w-80 md:w-96 mb-16"
+      >
         <fieldset disabled={isSubmitting}>
           <input type="hidden" name="intent" value={Intent.Create} />
-          <h2>Create a new remark</h2>
+          <h2 className="text-xl mb-3">Create a new remark</h2>
 
           <Field
             label="Title"
@@ -65,6 +69,7 @@ export default function Remarks() {
                 : undefined
             }
             placeholder="Walden"
+            className="mb-1"
           />
 
           <Field
@@ -82,27 +87,33 @@ export default function Remarks() {
                 : undefined
             }
             placeholder="Page 78"
+            className="mb-4"
           />
 
-          <button type="submit">
+          <button
+            type="submit"
+            className="block border-2 border-amber-400 rounded p-1 w-full active:bg-amber-400"
+          >
             {isSubmitting ? "Creating..." : "Create"}
           </button>
         </fieldset>
       </fetcher.Form>
-
-      {remarks.length > 0 ? (
-        <ul>
-          {remarks.map((remark) => (
-            <li key={remark.id}>
+      <ul className="flex flex-col lg:grid lg:grid-cols-3 lg:gap-8 mx-auto w-80 md:w-96 lg:w-full">
+        {remarks.length ? (
+          remarks.map((remark) => (
+            <li
+              key={remark.id}
+              className="mb-8 h-48 lg:m-0 border-4 p-3 rounded border-amber-400 border-dashed flex flex-col"
+            >
               <Remark {...remark} />
             </li>
-          ))}
-        </ul>
-      ) : (
-        <>
-          <p>You do not have any remarks right now!</p>
-        </>
-      )}
+          ))
+        ) : (
+          <>
+            <p>You do not have any remarks right now!</p>
+          </>
+        )}
+      </ul>
     </>
   );
 }
