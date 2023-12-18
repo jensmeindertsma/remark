@@ -2,6 +2,7 @@ import type { HTMLInputTypeAttribute } from "react";
 
 type Options = {
   autoComplete?: string;
+  className?: string;
   defaultValue?: string;
   error?: string;
   label: string;
@@ -13,6 +14,7 @@ type Options = {
 
 export function Field({
   autoComplete,
+  className,
   defaultValue,
   error,
   label,
@@ -23,8 +25,17 @@ export function Field({
 }: Options) {
   return (
     <>
-      <label htmlFor={name}>{label}</label>
+      <p>
+        <label htmlFor={name}>{label}</label>
+        <span
+          className="text-end text-sm text-red-500 float-right leading-6"
+          id={`${name}-error`}
+        >
+          {error}
+        </span>
+      </p>
       <input
+        key={name}
         aria-invalid={Boolean(error)}
         aria-describedby={`${name}-error`}
         autoComplete={autoComplete}
@@ -34,11 +45,10 @@ export function Field({
         placeholder={placeholder}
         required={required}
         type={type}
-        className="dark:bg-slate-600"
+        className={
+          "bg-neutral-100 rounded dark:bg-neutral-600 w-full " + className ?? ""
+        }
       />
-      <div style={{ color: "red" }} id={`${name}-error`}>
-        {error}
-      </div>
     </>
   );
 }

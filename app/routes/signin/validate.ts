@@ -11,15 +11,15 @@ export async function validate({ email, password }: Data) {
   let errors: { email?: string; password?: string } = {};
 
   if (!email) {
-    errors.email = "Please provide your email address";
+    errors.email = "This field is required";
   } else if (!email.includes("@")) {
-    errors.email = "This email address is invalid";
+    errors.email = "This address is invalid";
   } else if (!(await accountExists(email))) {
     errors.email = "There is no account associated with this address";
   }
 
   if (!password) {
-    errors.password = "Please provide your password";
+    errors.password = "This field is required";
   } else if (
     (await accountExists(email)) &&
     !(await passwordIsCorrect(password, email))

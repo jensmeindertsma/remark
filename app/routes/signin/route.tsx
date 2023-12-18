@@ -27,8 +27,8 @@ export default function SignUp() {
 
   return (
     <>
-      <h1>Sign in</h1>
-      <Form method="POST">
+      <h1 className="text-3xl w-80 mx-auto md:mt-40 md:w-96">Sign in</h1>
+      <Form method="POST" className="mx-auto mt-4 w-80 md:w-96">
         <fieldset disabled={isSubmitting}>
           <Field
             name="email"
@@ -37,6 +37,7 @@ export default function SignUp() {
             required
             defaultValue={feedback?.values.email}
             error={feedback?.errors.email}
+            className="mb-1 w-full"
           />
 
           <Field
@@ -46,9 +47,13 @@ export default function SignUp() {
             required
             defaultValue={feedback?.values.password}
             error={feedback?.errors.password}
+            className="mb-4 w-full"
           />
 
-          <button type="submit">
+          <button
+            type="submit"
+            className="block border-2 border-amber-400 rounded p-1 w-full active:bg-amber-400"
+          >
             {isSubmitting ? "Signing in..." : "Sign in"}
           </button>
         </fieldset>

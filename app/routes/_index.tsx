@@ -12,8 +12,20 @@ export function meta(): MetaResult {
 export default function Home() {
   return (
     <>
-      <p>Reading digital material was never this easy!</p>
-      <p>Remark is not my first Remix project!</p>
+      <p className="w-4/5 sm:w-2/3 md:w-3/5 mx-auto text-xl">
+        Reading digital material was never{" "}
+        <span className="underline decoration-amber-400">this easy</span>!
+      </p>
+      <p className="w-4/5 sm:w-2/3 md:w-3/5 mx-auto text-xl mt-10">
+        Remark is your{" "}
+        <span className="underline decoration-amber-400">all-in-one</span>{" "}
+        bookmark for online content.
+      </p>
+      <p className="w-4/5 sm:w-2/3 md:w-3/5 mx-auto text-xl mt-10">
+        Remark is your{" "}
+        <span className="underline decoration-amber-400">all-in-one</span>{" "}
+        bookmark for online content.
+      </p>
     </>
   );
 }

@@ -39,9 +39,9 @@ export default function Settings() {
 
   return (
     <>
-      <h1>Settings</h1>
+      <h1 className="text-3xl w-80 mx-auto md:mt-40 md:w-96">Settings</h1>
 
-      <fetcher.Form method="POST">
+      <fetcher.Form method="POST" className="mx-auto mt-4 w-80 md:w-96">
         <fieldset disabled={fetcher.state !== "idle"}>
           <Field
             name="name"
@@ -58,6 +58,7 @@ export default function Settings() {
                 ? fetcher.data?.errors.name
                 : undefined
             }
+            className="mb-1"
           />
 
           <Field
@@ -75,6 +76,7 @@ export default function Settings() {
                 ? fetcher.data?.errors.email
                 : undefined
             }
+            className="mb-1"
           />
 
           <Field
@@ -91,20 +93,27 @@ export default function Settings() {
                 ? fetcher.data?.errors.password
                 : undefined
             }
+            className="mb-4"
           />
 
-          <button type="submit" name="intent" value={Intent.Save}>
+          <button
+            type="submit"
+            name="intent"
+            value={Intent.Save}
+            className="block border-2 border-amber-400 rounded p-1 w-full active:bg-amber-400"
+          >
             Save
           </button>
         </fieldset>
       </fetcher.Form>
 
-      <Form method="POST">
+      <Form method="POST" className="mx-auto mt-4 w-80 md:w-96">
         <button
           type="submit"
           name="intent"
           value={Intent.Delete}
           disabled={isSubmitting || feedback?.status === Status.ConfirmDelete}
+          className="block border-2 border-red-500 rounded p-1 w-full active:bg-red-500 mb-4 disabled:border-gray-400 disabled:active:bg-gray-400"
         >
           Delete account
         </button>
@@ -115,6 +124,7 @@ export default function Settings() {
               name="intent"
               value={Intent.ConfirmDelete}
               disabled={isSubmitting}
+              className="block border-2 border-red-500 bg-red-500 rounded p-1 w-full mb-4"
             >
               Confirm
             </button>
@@ -123,6 +133,7 @@ export default function Settings() {
               name="intent"
               value={Intent.Cancel}
               disabled={isSubmitting}
+              className="block border-2 border-red-500 rounded p-1 w-full active:bg-red-500"
             >
               Cancel
             </button>

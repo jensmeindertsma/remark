@@ -17,13 +17,13 @@ export async function validate({ accountId, name, email, password }: Data) {
   if (!email) {
     errors.email = "This field is required";
   } else if (!email.includes("@")) {
-    errors.email = "This email address is invalid";
+    errors.email = "This address is invalid";
   } else if (!(await accountAvailable(accountId, email))) {
-    errors.email = "This email address is not available";
+    errors.email = "This address is not available";
   }
 
   if (password && password.length < 8) {
-    errors.password = "The password must be at least 8 characters long";
+    errors.password = "Must be at least 8 characters";
   }
 
   return Object.keys(errors).length ? errors : null;

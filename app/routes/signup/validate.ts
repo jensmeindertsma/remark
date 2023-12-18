@@ -10,21 +10,21 @@ export async function validate({ name, email, password }: Data) {
   let errors: { name?: string; email?: string; password?: string } = {};
 
   if (!name) {
-    errors.name = "A name is required";
+    errors.name = "This field is required";
   }
 
   if (!email) {
-    errors.email = "An email address is required";
+    errors.email = "This field is required";
   } else if (!email.includes("@")) {
-    errors.email = "This email address is invalid";
+    errors.email = "This address is invalid";
   } else if (await accountExists(email)) {
-    errors.email = "This email address is already in use";
+    errors.email = "This address is already in use";
   }
 
   if (!password) {
-    errors.password = "A password is required";
+    errors.password = "This field is required";
   } else if (password.length < 8) {
-    errors.password = "The password must be at least 8 characters long";
+    errors.password = "Must be at least 8 characters";
   }
 
   return Object.keys(errors).length ? errors : null;

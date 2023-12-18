@@ -96,7 +96,7 @@ function Document({ children }: { children: ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="text-neutral-800 dark:bg-neutral-800 dark:text-white p-3 sm:p-6">
+      <body className="text-neutral-800 dark:bg-neutral-800 dark:text-white font-serif p-3 sm:p-6">
         {children}
         <ScrollRestoration />
 
