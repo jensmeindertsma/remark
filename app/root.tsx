@@ -1,11 +1,9 @@
-import { prisma } from "./utilities/database.server.ts";
+import { Header } from "./components/Header.tsx";
 import type { LoaderArguments } from "./utilities/remix.ts";
 import { getSession } from "./utilities/session.server.ts";
 import { json } from "@remix-run/node";
 import {
-  Form,
   isRouteErrorResponse,
-  Link,
   Links,
   LiveReload,
   Meta,
@@ -13,71 +11,33 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useNavigation,
   useRouteError,
 } from "@remix-run/react";
 import type { ReactNode } from "react";
 
-import tailwind from "./tailwind.css";
+import fonts from "./styles/fonts.css";
+import tailwind from "./styles/tailwind.css";
 
 const ENABLE_SCRIPTS = true;
 
 export function links() {
   return [
+    { rel: "icon", type: "image/png", href: "/icons/favicon.png" },
     { rel: "stylesheet", href: tailwind },
-    { rel: "icon", type: "image/png", href: "/crayon.png" },
+    { rel: "stylesheet", href: fonts },
   ];
 }
 
 export default function Root() {
-  const { isAuthenticated, name } = useLoaderData<typeof loader>();
-  const navigation = useNavigation();
+  const { isAuthenticated } = useLoaderData<typeof loader>();
 
   return (
     <Document>
-      <header className="dark:bg-slate-500 flex flex-row justify-between">
-        <nav>
-          <ul className="flex flex-row justify-between">
-            <li>
-              <Link to={isAuthenticated ? "/remarks" : "/"}>Remark</Link>
-            </li>
-            {isAuthenticated ? (
-              <>
-                <li>
-                  <Link to="/remarks">Remarks</Link>
-                </li>
-                <li>
-                  <Link to="/settings">Settings</Link>
-                </li>
-              </>
-            ) : (
-              <>
-                <li>
-                  <Link to="/signup">Sign up</Link>
-                </li>
-                <li>
-                  <Link to="/signin">Sign in</Link>
-                </li>
-              </>
-            )}
-          </ul>
-        </nav>
+      <Header isAuthenticated={isAuthenticated} />
 
-        {isAuthenticated ? <div>Welcome, {name}</div> : null}
-
-        {isAuthenticated ? (
-          <Form method="POST" action="/signout">
-            <button
-              type="submit"
-              disabled={navigation.formAction === "/signout"}
-            >
-              {navigation.formAction === "/signout" ? "Working..." : "Sign out"}
-            </button>
-          </Form>
-        ) : null}
-      </header>
-
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
     </Document>
   );
 }
@@ -87,10 +47,6 @@ export async function loader({ request }: LoaderArguments) {
 
   return json({
     isAuthenticated: session.isActive,
-    name: session.isActive
-      ? (await prisma.account.findUnique({ where: { id: session.userId } }))
-          ?.name
-      : undefined,
   });
 }
 
@@ -140,7 +96,7 @@ function Document({ children }: { children: ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="dark:bg-gray-900 dark:text-white">
+      <body className="text-neutral-800 dark:bg-neutral-800 dark:text-white p-3 sm:p-6">
         {children}
         <ScrollRestoration />
 

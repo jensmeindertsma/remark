@@ -1,0 +1,6 @@
+@font-face {
+  font-family: "Playfair Display";
+  src: url("/fonts/playfair_display_variable.ttf");
+  font-weight: 400 900;
+  font-display: swap;
+}
