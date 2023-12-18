@@ -102,7 +102,7 @@ export default function Settings() {
             value={Intent.Save}
             className="block border-2 border-amber-400 rounded p-1 w-full active:bg-amber-400"
           >
-            Save
+            {fetcher.state !== "idle" ? "Saving" : "Save"}
           </button>
         </fieldset>
       </fetcher.Form>
