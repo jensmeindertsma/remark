@@ -4,7 +4,7 @@ Remark is your bookmark and notebook for all your online reading.
 
 ## About
 
-I built this project with Remix, an awesome React meta-framework. I also used Prisma as a database client, and wrote the code in TypeScript. The design is implemented using TailwindCSS, this was my first time using it. This application runs in production on [remark.jensmeindertsma.com](https://remark.jensmeindertsma.com/). Every commit goes through a CI process and if all checks pass the changes are automatically deployed to the Droplet running Dokku.
+I built this project with Remix, an awesome React meta-framework. I also used Prisma as a database client, and wrote the code in TypeScript. The design is implemented using TailwindCSS, this was my first time using it. This application runs in production on [remark.jensmeindertsma.com](https://remark.jensmeindertsma.com/). Every commit goes through a CI process and if all checks pass the changes are automatically deployed to the Droplet running Dokku. change
 
 ## Setting up
 
